@@ -4,6 +4,7 @@ import {getRepository} from "typeorm";
 import CreatePostDto from "./post.dto";
 import express = require("express");
 import PostNotFoundException from "../exceptions/PostNotFoundException";
+import validationMiddleware from "../middleware/validation.middleware";
 
 class PostController implements Controller {
     public path = '/posts';
@@ -11,7 +12,15 @@ class PostController implements Controller {
     private postRepository = getRepository(Post);
 
     constructor() {
+        this.initializeRoutes();
+    }
 
+    private initializeRoutes() {
+        this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
+        this.router.get(this.path, this.getAllPosts);
+        this.router.get(`${this.path}/:id`, this.getPostById);
+        this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
+        this.router.delete(`${this.path}/:id`, this.deletePost);
     }
 
     private createPost = async (request: express.Request, response: express.Response) => {
@@ -58,3 +67,5 @@ class PostController implements Controller {
         }
     }
 }
+
+export default PostController;
