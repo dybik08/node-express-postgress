@@ -15,7 +15,10 @@ class User {
     @Column()
     public password: string;
 
-    @OneToOne(() => Address, (address: Address) => address.user)
+    @OneToOne(() => Address, (address: Address) => address.user, {
+        cascade: true,
+        eager: true,
+    })
     @JoinColumn()
     public address: Address;
 }
