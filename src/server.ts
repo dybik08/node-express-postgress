@@ -5,6 +5,8 @@ import App from './app';
 import config from './ormconfig';
 import PostController from './post/post.controller';
 import validateEnv from './utils/validateEnv';
+import AddressController from "./address/address.controller";
+import UserController from "./user/user.controller";
 
 validateEnv();
 
@@ -18,6 +20,8 @@ validateEnv();
     const app = new App(
         [
             new PostController(),
+            new AddressController(),
+            new UserController(),
         ],
     );
     app.listen();
