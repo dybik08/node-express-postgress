@@ -9,6 +9,9 @@ const config: ConnectionOptions = {
     database: process.env.POSTGRES_DB,
     entities: [__dirname + '/entity/**/*.entity.ts', __dirname + '/entity/**/*.entity.js'],
     migrations: [__dirname + '/migrations/**/*.ts', __dirname + '/migration/**/*.js'],
+    cli: {
+        migrationsDir: 'src/migrations',
+    },
 };
 
 export default config;
