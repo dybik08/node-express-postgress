@@ -9,12 +9,12 @@ import User from '../user/user.entity';
 import {Secret} from "jsonwebtoken";
 
 async function authMiddleware(request: RequestWithUser, response: Response, next: NextFunction) {
-    const cookies = request.cookies;
+    const token = request.headers.authorization?.split(' ')[1];
     const userRepository = getRepository(User);
-    if (cookies && cookies.Authorization) {
+    if (token) {
         const secret = process.env.JWT_SECRET;
         try {
-            const verificationResponse = jwt.verify(cookies.Authorization, secret as Secret) as DataStoredInToken;
+            const verificationResponse = jwt.verify(token, secret as Secret) as DataStoredInToken;
             const id = verificationResponse.id;
             const user = await userRepository.findOne(id);
             if (user) {
