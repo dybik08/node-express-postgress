@@ -5,6 +5,7 @@ import CreatePostDto from "./post.dto";
 import express = require("express");
 import PostNotFoundException from "../exceptions/PostNotFoundException";
 import validationMiddleware from "../middleware/validation.middleware";
+import RequestWithUser from "../interfaces/requestWithUser.interface";
 
 class PostController implements Controller {
     public path = '/posts';
@@ -16,16 +17,19 @@ class PostController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, validationMiddleware(CreatePostDto), this.createPost);
+        this.router.post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
         this.router.get(this.path, this.getAllPosts);
         this.router.get(`${this.path}/:id`, this.getPostById);
         this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
         this.router.delete(`${this.path}/:id`, this.deletePost);
     }
 
-    private createPost = async (request: express.Request, response: express.Response) => {
+    private createPost = async (request: RequestWithUser, response: express.Response) => {
         const postData: CreatePostDto = request.body;
-        const newPost = this.postRepository.create(postData);
+        const newPost = this.postRepository.create({
+            ...postData,
+            author: request.user,
+        });
         await this.postRepository.save(newPost);
         response.send(newPost);
     }
