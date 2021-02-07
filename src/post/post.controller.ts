@@ -6,6 +6,7 @@ import express = require("express");
 import PostNotFoundException from "../exceptions/PostNotFoundException";
 import validationMiddleware from "../middleware/validation.middleware";
 import RequestWithUser from "../interfaces/requestWithUser.interface";
+import authMiddleware from "../middleware/auth.middleware";
 
 class PostController implements Controller {
     public path = '/posts';
@@ -17,11 +18,17 @@ class PostController implements Controller {
     }
 
     private initializeRoutes() {
-        this.router.post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
         this.router.get(this.path, this.getAllPosts);
         this.router.get(`${this.path}/:id`, this.getPostById);
-        this.router.patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost);
-        this.router.delete(`${this.path}/:id`, this.deletePost);
+
+
+        this.router
+        // @ts-ignore
+            .all(`${this.path}/*`, authMiddleware)
+            .patch(`${this.path}/:id`, validationMiddleware(CreatePostDto, true), this.modifyPost)
+            .delete(`${this.path}/:id`, this.deletePost)
+            // @ts-ignore
+            .post(this.path, authMiddleware, validationMiddleware(CreatePostDto), this.createPost);
     }
 
     private createPost = async (request: RequestWithUser, response: express.Response) => {
