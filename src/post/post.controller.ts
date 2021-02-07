@@ -33,6 +33,7 @@ class PostController implements Controller {
 
     private createPost = async (request: RequestWithUser, response: express.Response) => {
         const postData: CreatePostDto = request.body;
+        // @ts-ignore
         const newPost = this.postRepository.create({
             ...postData,
             author: request.user,
@@ -42,13 +43,13 @@ class PostController implements Controller {
     }
 
     private getAllPosts = async (request: express.Request, response: express.Response) => {
-        const posts = await this.postRepository.find();
+        const posts = await this.postRepository.find({ relations: ['categories'] });
         response.send(posts);
     }
 
     private getPostById = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const id = request.params.id;
-        const post = await this.postRepository.findOne(id);
+        const post = await this.postRepository.findOne(id, { relations: ['categories'] });
         if (post) {
             response.send(post);
         } else {
